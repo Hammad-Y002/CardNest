@@ -32,6 +32,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Spinner } from "../ui/spinner"
 
 export default function ClassManagement() {
   const [classes, setClasses] = useState([])

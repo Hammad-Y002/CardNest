@@ -1,5 +1,5 @@
 "use client"
-import { useNavigate, Link } from "react-router-dom"
+import { useNavigate, Link, useLocation } from "react-router-dom" // Added useLocation
 import { useAuth } from "../../contexts/AuthContext"
 import { Button } from "@/components/ui/button"
 import { ModeToggle } from "@/components/ui/mode-toggle"
@@ -31,6 +31,7 @@ import {
 export default function MainLayout({ children }) {
   const { currentUser, logout, userRole } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation() // Get the current location
 
   async function handleLogout() {
     try {
@@ -90,7 +91,12 @@ export default function MainLayout({ children }) {
                     {menuItems.map((item, index) => (
                       <SidebarMenuItem key={index}>
                         <SidebarMenuButton asChild>
-                          <Link to={item.path} className="flex items-center">
+                          <Link
+                            to={item.path}
+                            className={`flex items-center ${
+                              location.pathname === item.path ? "bg-primary text-white" : ""
+                            }`}
+                          >
                             {item.icon}
                             <span className="ml-2">{item.label}</span>
                           </Link>
