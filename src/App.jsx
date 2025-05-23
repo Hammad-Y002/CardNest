@@ -17,6 +17,7 @@ import UsersPage from "./pages/admin/UsersPage"
 import ClassesPage from "./pages/admin/ClassesPage"
 import MyClassesPage from "./pages/MyClassesPage"
 import ClassFlashcardsPage from "./pages/ClassFlashcardsPage"
+import FlashcardDetailsPage from "./components/flashcards/FlashcardDetailsPage"
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
               <Route path="/signup" element={<SignUpPage />} />
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/flashcards" element={<FlashcardsPage />} />
+              <Route path="/flashcards/:flashcardId" element={<FlashcardDetailsPage />} />
               <Route path="/flashcards/new" element={<CreateFlashcardPage />} />
               <Route path="/folders" element={<FoldersPage />} />
               <Route path="/folders/new" element={<CreateFolderPage />} />

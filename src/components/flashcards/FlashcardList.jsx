@@ -46,6 +46,7 @@ export default function FlashcardList() {
   const [editTitle, setEditTitle] = useState("")
   const [editAnswer, setEditAnswer] = useState("")
   const [editFolderId, setEditFolderId] = useState(null)
+  const [selectedFlashcard, setSelectedFlashcard] = useState(null) // State for selected flashcard
   const { currentUser, userRole } = useAuth()
   const navigate = useNavigate()
 
@@ -223,16 +224,25 @@ export default function FlashcardList() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredFlashcards.map((flashcard) => (
-                <Card key={flashcard.id} className="overflow-hidden">
+                <div
+                key={flashcard.id}
+                className="cursor-pointer"
+                // onClick={() => navigate(`/flashcards/${flashcard.id}`)}
+                onClick={() => setSelectedFlashcard(flashcard)}
+              >
+                <Card className="overflow-hidden">
                   <CardContent className="p-0">
                     <FlashcardItem flashcard={flashcard} />
                     <div className="p-4 flex justify-end space-x-2">
-                      <Button variant="outline" size="icon" onClick={() => handleEditFlashcard(flashcard)}>
+                      <Button variant="outline" size="icon" onClick={(e) => {
+                        e.stopPropagation()
+                        handleEditFlashcard(flashcard)
+                      }}>
                         <Edit className="h-4 w-4" />
                       </Button>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <Button variant="outline" size="icon">
+                          <Button variant="outline" size="icon" onClick={(e) => e.stopPropagation()}>
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </AlertDialogTrigger>
@@ -254,6 +264,7 @@ export default function FlashcardList() {
                     </div>
                   </CardContent>
                 </Card>
+              </div>
               ))}
             </div>
           )}
@@ -323,6 +334,27 @@ export default function FlashcardList() {
               Save Changes
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+       {/* Flashcard Details Dialog */}
+       <Dialog open={!!selectedFlashcard} onOpenChange={() => setSelectedFlashcard(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{selectedFlashcard?.title}</DialogTitle>
+            <DialogDescription>
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">Question</p>
+                  <p className="text-lg font-bold">{selectedFlashcard?.question}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-2">Answer</p>
+                  <p className="text-lg">{selectedFlashcard?.answer}</p>
+                </div>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
         </DialogContent>
       </Dialog>
     </div>

@@ -94,7 +94,7 @@ export default function MainLayout({ children }) {
                           <Link
                             to={item.path}
                             className={`flex items-center ${
-                              location.pathname === item.path ? "bg-primary text-white" : ""
+                              location.pathname === item.path ? "bg-neutral-600/50 text-white" : ""
                             }`}
                           >
                             {item.icon}
