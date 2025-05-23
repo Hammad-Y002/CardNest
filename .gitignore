@@ -1,0 +1,55 @@
+# Dependencies
+/node_modules/
+
+# Build output
+/dist/
+/build/
+
+# Vite cache
+/.vite/
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment variables
+.env
+.env.*.local
+.env*
+
+# Editor directories and files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# macOS metadata
+*.DS_Store
+
+# Optional: ignore coverage reports
+coverage/
+
+# Optional: ignore local testing tools
+playwright-report/
+test-results/
+
+# Optional: ignore TypeScript build output
+*.tsbuildinfo
+
+# Optional: ignore Parcel cache (if used)
+.cache/
+
+# Optional: ignore eslint cache
+.eslintcache
+
+# Optional: ignore JetBrains IDEs
+*.iml
+*.ipr
+*.iws
+out/

@@ -50,11 +50,12 @@ export default function DashboardCharts() {
         } else {
           flashcardsQuery = query(collection(db, "flashcards"), where("createdBy", "==", currentUser.uid))
         }
-        const flashcardsSnapshot = await getDocs(flashcardsQuery)
+        const flashcardsSnapshot = await getDocs(flashcardsQuery);
         const flashcardsData = flashcardsSnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
-        }))
+          folderName: doc.data().folderName || "Unorganized", // Add folderName if available
+        }));
         setFlashcardData(flashcardsData)
 
         // Fetch classes data
@@ -64,11 +65,13 @@ export default function DashboardCharts() {
         } else {
           classesQuery = collection(db, "classes")
         }
-        const classesSnapshot = await getDocs(classesQuery)
+        // Fetch classes data
+        const classesSnapshot = await getDocs(classesQuery);
         const classesData = classesSnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
-        }))
+          name: doc.data().name || "Unnamed Class", // Add name if available
+        }));
         setClassData(classesData)
       } catch (error) {
         console.error("Error fetching chart data:", error)
@@ -86,29 +89,29 @@ export default function DashboardCharts() {
   const userRoleData = userData.reduce(
     (acc, user) => {
       if (user.role === "admin") {
-        acc[0].value++
+        acc[0].value++;
       } else {
-        acc[1].value++
+        acc[1].value++;
       }
-      return acc
+      return acc;
     },
     [
       { name: "Admins", value: 0 },
       { name: "Users", value: 0 },
-    ],
-  )
+    ]
+  );
 
   // Prepare flashcard data by folder
   const folderFlashcardCounts = flashcardData.reduce((acc, flashcard) => {
-    const folderId = flashcard.folderId || "Unorganized"
-    acc[folderId] = (acc[folderId] || 0) + 1
-    return acc
-  }, {})
+    const folderName = flashcard.folderName || "Unorganized"; // Use folderName if available, fallback to "Unorganized"
+    acc[folderName] = (acc[folderName] || 0) + 1;
+    return acc;
+  }, {});
 
-  const folderFlashcardData = Object.entries(folderFlashcardCounts).map(([folderId, count]) => ({
-    name: folderId === "Unorganized" ? "Unorganized" : folderId,
+  const folderFlashcardData = Object.entries(folderFlashcardCounts).map(([folderName, count]) => ({
+    name: folderName,
     value: count,
-  }))
+  }));
 
   // Prepare class member data
   const classMemberData = classData.map((classObj) => ({

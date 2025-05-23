@@ -12,10 +12,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
+import { Input } from "@/components/ui/input"
 
 
 export default function FlashcardForm({ folders = [] }) {
   const [question, setQuestion] = useState("")
+  const [title, setTitle] = useState("")
   const [answer, setAnswer] = useState("")
   const [folderId, setFolderId] = useState(null)
   const [error, setError] = useState("")
@@ -35,6 +37,7 @@ export default function FlashcardForm({ folders = [] }) {
       setLoading(true)
 
       const flashcardData = {
+        title,
         question,
         answer,
         createdBy: currentUser.uid,
@@ -52,6 +55,7 @@ export default function FlashcardForm({ folders = [] }) {
       })
 
       // Reset form
+      setTitle("")
       setQuestion("")
       setAnswer("")
       setFolderId(null)
@@ -78,6 +82,17 @@ export default function FlashcardForm({ folders = [] }) {
           </Alert>
         )}
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="title">Title</Label>
+            <Input
+              id="title"
+              placeholder="Enter a title, like “Biology - Chapter 22: Evolution”"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+              // className="min-h-[100px]"
+            />
+          </div>
           <div className="space-y-2">
             <Label htmlFor="question">Question</Label>
             <Textarea

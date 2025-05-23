@@ -10,6 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Plus, Trash2, FolderPlus, Edit } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -41,7 +43,9 @@ export default function FlashcardList() {
   const [selectedFolder, setSelectedFolder] = useState("all")
   const [editingFlashcard, setEditingFlashcard] = useState(null)
   const [editQuestion, setEditQuestion] = useState("")
+  const [editTitle, setEditTitle] = useState("")
   const [editAnswer, setEditAnswer] = useState("")
+  const [editFolderId, setEditFolderId] = useState(null)
   const { currentUser, userRole } = useAuth()
   const navigate = useNavigate()
 
@@ -123,29 +127,33 @@ export default function FlashcardList() {
 
   const handleEditFlashcard = (flashcard) => {
     setEditingFlashcard(flashcard)
+    setEditTitle(flashcard.title)
     setEditQuestion(flashcard.question)
     setEditAnswer(flashcard.answer)
+    setEditFolderId(flashcard.folderId || null)
   }
 
   const handleSaveEdit = async () => {
-    if (!editQuestion.trim() || !editAnswer.trim()) {
+    if (!editQuestion.trim() || !editAnswer.trim() || !editTitle.trim()) {
       toast.error("Error", {
-        description: "Question and answer cannot be empty",
+        description: "Question, answer, and title cannot be empty",
       })
       return
     }
 
     try {
       await updateDoc(doc(db, "flashcards", editingFlashcard.id), {
+        title: editTitle,
         question: editQuestion,
         answer: editAnswer,
+        folderId: editFolderId, // Update the folder ID
       })
 
       // Update the flashcard in the state
       setFlashcards(
         flashcards.map((flashcard) =>
           flashcard.id === editingFlashcard.id
-            ? { ...flashcard, question: editQuestion, answer: editAnswer }
+            ? { ...flashcard, question: editQuestion, answer: editAnswer, title: editTitle, folderId: editFolderId }
             : flashcard,
         ),
       )
@@ -156,8 +164,10 @@ export default function FlashcardList() {
 
       // Reset the editing state
       setEditingFlashcard(null)
+      setEditTitle("")
       setEditQuestion("")
       setEditAnswer("")
+      setEditFolderId(null)
     } catch (error) {
       console.error("Error updating flashcard:", error)
       toast.error("Error", {
@@ -255,9 +265,20 @@ export default function FlashcardList() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Flashcard</DialogTitle>
-            <DialogDescription>Update the question and answer for this flashcard.</DialogDescription>
+            <DialogDescription>Update the details for this flashcard.</DialogDescription>
           </DialogHeader>
+
           <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-title">Title</Label>
+              <Input
+                id="edit-title"
+                placeholder="Enter a title, like “Biology - Chapter 22: Evolution”"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                required
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="edit-question">Question</Label>
               <Textarea
@@ -276,12 +297,31 @@ export default function FlashcardList() {
                 className="min-h-[100px]"
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-folder">Folder</Label>
+              <Select value={editFolderId} onValueChange={setEditFolderId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a folder" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={null}>None</SelectItem>
+                  {folders.map((folder) => (
+                    <SelectItem key={folder.id} value={folder.id}>
+                      {folder.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditingFlashcard(null)}>
               Cancel
             </Button>
-            <Button onClick={handleSaveEdit}>Save Changes</Button>
+            <Button onClick={handleSaveEdit} disabled={loading}>
+              Save Changes
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

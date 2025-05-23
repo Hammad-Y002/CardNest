@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { BookOpen, Users } from "lucide-react"
 import { Link } from "react-router-dom"
 import { toast } from "sonner"
+import { Spinner } from "../ui/spinner"
 
 export default function MyClasses() {
   const [classes, setClasses] = useState([])
@@ -79,7 +80,7 @@ export default function MyClasses() {
       <h2 className="text-2xl font-bold">My Classes</h2>
 
       {loading ? (
-        <div className="text-center py-8">Loading classes...</div>
+        <div className="text-center py-8 flex items-center gap-2 justify-center w-full"> <Spinner size="small" /> Loading classes...</div>
       ) : classes.length === 0 ? (
         <div className="text-center py-8">
           <p className="text-muted-foreground">You are not enrolled in any classes</p>

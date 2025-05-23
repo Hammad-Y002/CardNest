@@ -339,7 +339,7 @@ export default function ClassManagement() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="text-center py-4">Loading classes...</div>
+            <div className="text-center py-4 flex items-center gap-2 justify-center w-full"><Spinner size="small" /> Loading classes...</div>
           ) : classes.length === 0 ? (
             <div className="text-center py-4">
               <p className="text-muted-foreground">No classes found</p>

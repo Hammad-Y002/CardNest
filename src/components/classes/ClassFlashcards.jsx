@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChevronLeft, ChevronRight, ArrowLeft } from "lucide-react"
 import { toast } from "sonner"
+import { Spinner } from "../ui/spinner"
 
 export default function ClassFlashcards() {
   const { classId } = useParams()
@@ -16,7 +17,7 @@ export default function ClassFlashcards() {
   const [flashcards, setFlashcards] = useState([])
   const [folderFlashcards, setFolderFlashcards] = useState([])
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [flipped, setFlipped] = useState(false)
+  // const [flipped, setFlipped] = useState(false)
   const [loading, setLoading] = useState(true)
   const { currentUser } = useAuth()
   const navigate = useNavigate()
@@ -99,22 +100,22 @@ export default function ClassFlashcards() {
   // Combine flashcards from direct assignments and folders
   const allFlashcards = [...flashcards, ...folderFlashcards]
 
-  const handleFlip = () => {
-    setFlipped(!flipped)
-  }
+  // const handleFlip = () => {
+  //   setFlipped(!flipped)
+  // }
 
   const handleNext = () => {
-    setFlipped(false)
+    // setFlipped(false)
     setCurrentIndex((prevIndex) => (prevIndex + 1) % allFlashcards.length)
   }
 
   const handlePrevious = () => {
-    setFlipped(false)
+    // setFlipped(false)
     setCurrentIndex((prevIndex) => (prevIndex - 1 + allFlashcards.length) % allFlashcards.length)
   }
 
   if (loading) {
-    return <div className="text-center py-8">Loading class materials...</div>
+    return <div className="text-center py-8 flex items-center gap-2 justify-center w-full"><Spinner size="small" /> Loading class materials...</div>
   }
 
   if (allFlashcards.length === 0) {
@@ -156,20 +157,21 @@ export default function ClassFlashcards() {
         </p>
       </div>
 
-      <Card className="h-64 cursor-pointer" onClick={handleFlip}>
-        <CardContent className="p-0 h-full flex items-center justify-center">
+      <Card className="h-64">
+        <CardContent className="p-0 h-full flex flex-col items-center justify-center">
           <div className="p-6 text-center w-full">
-            {flipped ? (
-              <div>
-                <p className="text-sm text-muted-foreground mb-2">Answer</p>
-                <p className="text-lg">{currentFlashcard.answer}</p>
-              </div>
-            ) : (
-              <div>
-                <p className="text-sm text-muted-foreground mb-2">Question</p>
-                <p className="text-lg">{currentFlashcard.question}</p>
-              </div>
-            )}
+            <div className="mb-4 flex gap-2 items-center justify-center">
+              <p className="text-lg text-muted-foreground">Title:</p>
+              <p className="text-lg font-bold">{currentFlashcard.title}</p>
+            </div>
+            <div className="mb-4">
+              <p className="text-sm text-muted-foreground mb-2">Question</p>
+              <p className="text-lg font-bold">{currentFlashcard.question}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">Answer</p>
+              <p className="text-lg">{currentFlashcard.answer}</p>
+            </div>
           </div>
         </CardContent>
       </Card>
