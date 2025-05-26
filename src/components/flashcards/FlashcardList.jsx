@@ -72,13 +72,17 @@ export default function FlashcardList() {
 
   // Set initial selectedFolder based on URL query parameter
   useEffect(() => {
-    const folderId = urlQuery.get("folder");
-    if (folderId) {
-      setSelectedFolder(folderId);
-    } else {
-      setSelectedFolder("all");
-    }
-  }, [urlQuery]);
+  const folderId = urlQuery.get("folder");
+  const filter = urlQuery.get("filter");
+  
+  if (folderId) {
+    setSelectedFolder(folderId);
+  } else if (filter === "unorganized") {
+    setSelectedFolder("unorganized");
+  } else {
+    setSelectedFolder("all");
+  }
+}, [urlQuery]);
 
   useEffect(() => {
     async function fetchFlashcards() {
@@ -100,7 +104,7 @@ export default function FlashcardList() {
           id: doc.id,
           ...doc.data(),
         }));
-        console.log("Fetched flashcards:", flashcardsData); // Debug log
+        // console.log("Fetched flashcards:", flashcardsData); // Debug log
         setFlashcards(flashcardsData);
       } catch (error) {
         console.error("Error fetching flashcards:", error);
@@ -131,7 +135,7 @@ export default function FlashcardList() {
           id: doc.id,
           ...doc.data(),
         }));
-        console.log("Fetched folders:", foldersData); // Debug log
+        // console.log("Fetched folders:", foldersData); // Debug log
         setFolders(foldersData);
       } catch (error) {
         console.error("Error fetching folders:", error);
@@ -192,12 +196,12 @@ export default function FlashcardList() {
         flashcards.map((flashcard) =>
           flashcard.id === editingFlashcard.id
             ? {
-                ...flashcard,
-                question: editQuestion,
-                answer: editAnswer,
-                title: editTitle,
-                folderId: editFolderId,
-              }
+              ...flashcard,
+              question: editQuestion,
+              answer: editAnswer,
+              title: editTitle,
+              folderId: editFolderId,
+            }
             : flashcard
         )
       );
@@ -220,23 +224,29 @@ export default function FlashcardList() {
   };
 
   const handleTabChange = (value) => {
-    setSelectedFolder(value);
-    navigate(
-      value === "all" || value === "unorganized"
-        ? "/flashcards"
-        : `/flashcards?folder=${value}`
-    );
-  };
+  setSelectedFolder(value);
+  if (value === "all") {
+    navigate("/flashcards");
+  } else if (value === "unorganized") {
+    navigate("/flashcards?filter=unorganized");
+  } else {
+    navigate(`/flashcards?folder=${value}`);
+  }
+};
 
   const filteredFlashcards =
-    selectedFolder === "all"
-      ? flashcards
-      : selectedFolder === "unorganized"
-      ? flashcards.filter(
-          (flashcard) => !flashcard.folderId || flashcard.folderId === null
-        )
-      : flashcards.filter((flashcard) => flashcard.folderId === selectedFolder);
+  selectedFolder === "all"
+    ? flashcards
+    : selectedFolder === "unorganized"
+    ? flashcards.filter(
+        (flashcard) => 
+          !flashcard.folderId || 
+          flashcard.folderId === null || 
+          flashcard.folderId === ""
+      )
+    : flashcards.filter((flashcard) => flashcard.folderId === selectedFolder);
 
+  // console.log("Flashcard folderIds:", flashcards.map(f => f.folderId));
   return (
     <div className="space-y-4 sm:space-y-6 px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
@@ -244,9 +254,8 @@ export default function FlashcardList() {
           {selectedFolder === "all"
             ? "All Flashcards"
             : selectedFolder === "unorganized"
-            ? "Unorganized Flashcards"
-            : `Flashcards in ${
-                folders.find((f) => f.id === selectedFolder)?.name || "Folder"
+              ? "Unorganized Flashcards"
+              : `Flashcards in ${folders.find((f) => f.id === selectedFolder)?.name || "Folder"
               }`}
         </h2>
         <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
@@ -260,10 +269,9 @@ export default function FlashcardList() {
           <Button
             onClick={() =>
               navigate(
-                `/flashcards/new${
-                  selectedFolder !== "all" && selectedFolder !== "unorganized"
-                    ? `?folder=${selectedFolder}`
-                    : ""
+                `/flashcards/new${selectedFolder !== "all" && selectedFolder !== "unorganized"
+                  ? `?folder=${selectedFolder}`
+                  : ""
                 }`
               )
             }
@@ -280,7 +288,7 @@ export default function FlashcardList() {
         value={selectedFolder}
         onValueChange={handleTabChange}
       >
-        <TabsList className="mb-4 sm:mb-6 flex flex-wrap gap-2 overflow-x-auto">
+        {/* <TabsList className="mb-4 sm:mb-6 flex flex-wrap gap-2 overflow-x-auto">
           <TabsTrigger
             value="all"
             className="text-xs sm:text-sm md:text-base px-3 py-1"
@@ -302,12 +310,24 @@ export default function FlashcardList() {
               {folder.name}
             </TabsTrigger>
           ))}
+        </TabsList> */}
+        <TabsList className="mb-4 flex flex-wrap gap-2 h-auto ">
+          <TabsTrigger value="all">All Flashcards</TabsTrigger>
+          <TabsTrigger value="unorganized">Unorganized</TabsTrigger>
+          {/* <div className=" "> */}
+            {folders.map((folder) => (
+              <TabsTrigger key={folder.id} value={folder.id}>
+                {folder.name}
+
+              </TabsTrigger>
+            ))}
+          {/* </div> */}
         </TabsList>
 
         <TabsContent value={selectedFolder}>
           {loading ? (
             <div className="flex items-center justify-center py-8 sm:py-12 gap-2 w-full">
-              <Spinner size="medium" />
+              <Spinner size="small" />
               <span className="text-sm sm:text-base md:text-lg">
                 Loading flashcards...
               </span>
@@ -318,19 +338,18 @@ export default function FlashcardList() {
                 {selectedFolder === "all"
                   ? "No flashcards found"
                   : selectedFolder === "unorganized"
-                  ? "No unorganized flashcards"
-                  : "No flashcards in this folder"}
+                    ? "No unorganized flashcards"
+                    : "No flashcards in this folder"}
               </p>
               <Button
                 variant="outline"
                 className="mt-4 text-xs sm:text-sm md:text-base px-3 py-2 sm:px-4 sm:py-2"
                 onClick={() =>
                   navigate(
-                    `/flashcards/new${
-                      selectedFolder !== "all" &&
+                    `/flashcards/new${selectedFolder !== "all" &&
                       selectedFolder !== "unorganized"
-                        ? `?folder=${selectedFolder}`
-                        : ""
+                      ? `?folder=${selectedFolder}`
+                      : ""
                     }`
                   )
                 }
