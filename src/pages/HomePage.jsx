@@ -29,7 +29,7 @@ export default function HomePage() {
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4">Welcome to CardNest</h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          The ultimate flashcard quiz hub for online learning and quizzes
+          The ultimate flashcard system for online learning
         </p>
         {!currentUser && (
           <div className="mt-8 flex justify-center gap-4">
